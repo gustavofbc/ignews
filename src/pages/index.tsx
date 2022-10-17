@@ -25,7 +25,7 @@ export default function Home({ product }: HomeProduct) {
           <span>👏 Hey, welcome</span>
           <h1>News about the <span>React</span> world.</h1>
           <p>
-            Get access to all the publication <br />Faz
+            Get access to all the publication <br />
             <span>for {product.amount} month</span>
           </p>
           <SubscribeButton priceId={product.priceId} />

@@ -4,7 +4,7 @@ import Head from "next/head";
 import { RichText } from "prismic-dom";
 import { getPrismicClient } from "../../services/prismic";
 
-import styles from './post.module.scss'
+import styles from './post.module.scss';
 
 interface PostProps {
     post: {
@@ -15,7 +15,8 @@ interface PostProps {
     }
 }
 
-export default function Post({ post }: PostProps) {
+export default function post({ post }: PostProps) {
+
     return (
         <>
             <Head>
@@ -23,46 +24,41 @@ export default function Post({ post }: PostProps) {
             </Head>
 
             <main className={styles.container}>
-                <article
-                    className={styles.post}
-                >
+                <article className={styles.post}>
                     <h1>{post.title}</h1>
                     <time>{post.updatedAt}</time>
                     <div
                         className={styles.postContent}
                         dangerouslySetInnerHTML={{ __html: post.content }}
-                    >
-                    </div>
+                    />
                 </article>
             </main>
         </>
     );
 }
 
-export const getServeSideProps: GetServerSideProps = async ({ req, params }) => {
-    const session = await getSession({ req });
-
-    console.log(session)
+export const getServerSideProps: GetServerSideProps = async ({ req, params }) => {
+    const session = await getSession({ req })
+    const { slug } = params;
 
     if (!session?.activeSubscription) {
         return {
             redirect: {
-                destination: '/',
+                destination: `/posts/preview/${slug}`,
                 permanent: false,
             }
         }
     }
 
-    const { slug } = params;
-    const prismic = getPrismicClient(req);
+    const prismic = getPrismicClient(req)
 
-    const response = await prismic.getByUID<any>('post', String(slug), {});
+    const response = await prismic.getByUID('posts', String(slug), {})
 
     const post = {
-        slug: response.uid,
+        slug,
         title: RichText.asText(response.data.title),
         content: RichText.asHtml(response.data.content),
-        updatedAt: new Date(response.last_publication_date).toLocaleDateString('pt-BR', {
+        updateAt: new Date(response.last_publication_date).toLocaleDateString('pt-BR', {
             day: '2-digit',
             month: 'long',
             year: 'numeric'
@@ -74,4 +70,5 @@ export const getServeSideProps: GetServerSideProps = async ({ req, params }) => 
             post
         }
     }
+
 }
